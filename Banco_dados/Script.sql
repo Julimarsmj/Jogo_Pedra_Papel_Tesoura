@@ -14,3 +14,8 @@ CREATE TABLE tbregistro (
 );
 
 select * from tbregistro;
+
+ALTER TABLE tbregistro
+MODIFY COLUMN nomecpu VARCHAR(12) DEFAULT 'CPU';
+
+desc tbregistro;
