@@ -130,7 +130,7 @@ public class TelaCadJogador extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "INFORME O NOME DO JOGADOR", "ERRO NO CADASTRO", JOptionPane.WARNING_MESSAGE);
             txtJogador.requestFocus();
         } else {
-            String sql = "insert into tbjogador (nomejogador) values (?)";
+            String sql = "insert into tbregistro (nomejogador) values (?)";
             try (Connection conexaoAtual = ModeloConexao.conector();
                     java.sql.PreparedStatement pst = conexaoAtual.prepareStatement(
                             sql,

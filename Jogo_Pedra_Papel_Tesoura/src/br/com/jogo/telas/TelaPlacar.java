@@ -9,6 +9,13 @@ package br.com.jogo.telas;
  *
  * @author Julimar
  */
+import br.com.jogo.dal.ModeloConexao;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 public class TelaPlacar extends javax.swing.JFrame {
 
     /**
@@ -16,6 +23,43 @@ public class TelaPlacar extends javax.swing.JFrame {
      */
     public TelaPlacar() {
         initComponents();
+        listarRankingCompleto();
+    }
+
+    public void listarRankingCompleto() {
+
+        
+        String sql = "SELECT "
+                + "nomejogador AS Jogador, "
+                + "pontuacao_jogador AS Pontos, "
+                + "resultado_final AS Resultado, "
+                + "pontuacao_cpu AS Pontos_CPU, "
+                + "nomecpu AS CPU "
+                + "FROM tbregistro ";
+        try (Connection conexao = ModeloConexao.conector();
+                PreparedStatement pst = conexao.prepareStatement(sql);
+                ResultSet rs = pst.executeQuery()) {
+
+            DefaultTableModel model = (DefaultTableModel) jTableRanking.getModel();
+            model.setNumRows(0);
+
+            while (rs.next()) {
+
+                model.addRow(new Object[]{
+                    rs.getString("Jogador"),
+                    rs.getInt("Pontos"),
+                    rs.getString("Resultado"),
+                    rs.getInt("Pontos_CPU"),
+                    rs.getString("CPU")
+                });
+            }
+
+            System.out.println("Ranking carregado com sucesso!");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro ao carregar o ranking: " + e.getMessage(), "Erro de Banco", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -27,21 +71,54 @@ public class TelaPlacar extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTableRanking = new javax.swing.JTable();
+        btnInicial = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Placar ");
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 653, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 709, Short.MAX_VALUE)
-        );
+        jTableRanking.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Título 1", "Título 2", "Título 3", "Título 4", "Título 5"
+            }
+        ));
+        jScrollPane1.setViewportView(jTableRanking);
 
-        pack();
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(54, 174, 550, 325));
+
+        btnInicial.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/jogo/img/paginaInicial.png"))); // NOI18N
+        btnInicial.setToolTipText("Página Inicial");
+        btnInicial.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnInicial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInicialActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnInicial, new org.netbeans.lib.awtextra.AbsoluteConstraints(291, 539, 80, -1));
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/jogo/img/logo.png"))); // NOI18N
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(54, 56, -1, -1));
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/jogo/img/background.jpg"))); // NOI18N
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-180, 0, 870, 730));
+
+        setSize(new java.awt.Dimension(671, 756));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnInicialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInicialActionPerformed
+        TelaInicial inicial = new TelaInicial();
+        inicial.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnInicialActionPerformed
 
     /**
      * @param args the command line arguments
@@ -79,5 +156,10 @@ public class TelaPlacar extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnInicial;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTableRanking;
     // End of variables declaration//GEN-END:variables
 }

@@ -32,7 +32,7 @@ public class TelaJogo extends javax.swing.JFrame {
 
     public void exibirNomeJogador() {
         int idDoJogador = br.com.jogo.telas.TelaCadJogador.idJogadorAtual;
-        String sql = "SELECT nomejogador FROM tbjogador WHERE id = ?";
+        String sql = "SELECT nomejogador FROM tbregistro WHERE id = ?";
         if (idDoJogador == 0) {
             lblNomeJogador.setText("Jogador não identificado");
             return;
@@ -150,10 +150,10 @@ public class TelaJogo extends javax.swing.JFrame {
         lblPontosCpu.setText(String.valueOf(pontoCpu));
     }
 
-    public void salvarJogador() {
-        String sql = "UPDATE tbjogador SET pontuacao = ?, resultado_final = ? WHERE id = ?";
+    public void salvarRegistroDePartida() {
 
-        // Verifica se o ID do jogador foi capturado
+        String sql = "UPDATE tbregistro SET pontuacao_jogador = ?, resultado_final = ?, pontuacao_cpu = ? WHERE id = ?";
+
         int idDoJogador = br.com.jogo.telas.TelaCadJogador.idJogadorAtual;
 
         if (idDoJogador == 0) {
@@ -163,37 +163,27 @@ public class TelaJogo extends javax.swing.JFrame {
 
         try (Connection conexao = ModeloConexao.conector();
                 java.sql.PreparedStatement pst = conexao.prepareStatement(sql)) {
-            pst.setInt(1, pontoJogador);
-            pst.setString(2, textoJogador);
-            pst.setInt(3, idDoJogador);
-            int linhasAfetadas = pst.executeUpdate();
 
-            if (linhasAfetadas > 0) {
-                System.out.println("Pontuação e resultado final salvos com sucesso! ID: " + idDoJogador);
-            }
+            // 1. Mapeia a pontuação do JOGADOR
+            pst.setInt(1, pontoJogador); // Corresponde a pontuacao_jogador
 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Erro ao salvar pontuação: " + e.getMessage(), "Erro de Banco", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
-    }
+            // 2. Mapeia o resultado final do JOGADOR
+            pst.setString(2, textoJogador); // Corresponde a resultado_final
 
-    public void salvarCpu() {
-        String sql = "INSERT INTO tbcpu (pontuacao, resultado_final) VALUES (?, ?)";
+            // 3. 💡 NOVO: Mapeia a pontuação do CPU
+            pst.setInt(3, pontoCpu); // Corresponde a pontuacao_cpu
 
-        try (Connection conexao = ModeloConexao.conector();
-                java.sql.PreparedStatement pst = conexao.prepareStatement(sql)) {
-            pst.setInt(1, pontoCpu);
-            pst.setString(2, textoCpu);
+            // 4. Mapeia o ID para o filtro WHERE
+            pst.setInt(4, idDoJogador); // Corresponde ao WHERE id
 
             int linhasAfetadas = pst.executeUpdate();
 
             if (linhasAfetadas > 0) {
-                System.out.println("Placar do CPU registrado com sucesso (NOVO REGISTRO)!");
+                System.out.println("Registro de partida salvo com sucesso! ID: " + idDoJogador);
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Erro ao salvar pontuação do CPU: " + e.getMessage(), "Erro de Banco", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erro ao salvar registro de partida: " + e.getMessage(), "Erro de Banco", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
@@ -214,9 +204,7 @@ public class TelaJogo extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "FIM DE JOGO! Você PERDEU!");
 
             }
-
-            salvarJogador();
-            salvarCpu();
+            salvarRegistroDePartida();
             TelaInicial inicio = new TelaInicial();
             inicio.setVisible(true);
             this.setVisible(false);
