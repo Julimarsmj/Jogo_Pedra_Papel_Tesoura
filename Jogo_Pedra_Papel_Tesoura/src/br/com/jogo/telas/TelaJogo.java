@@ -9,6 +9,12 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 import br.com.jogo.dal.ModeloConexao;
 import java.sql.*;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
+import java.net.URL;
+import javax.sound.sampled.Clip;
 
 /**
  *
@@ -19,17 +25,60 @@ public class TelaJogo extends javax.swing.JFrame {
     /**
      * Creates new form TelaJogo
      */
+    // Variável para controlar a música
+    private Clip musicaDeFundo;
+
     public TelaJogo() {
         initComponents();
         iconeCpu();
         exibirNomeJogador();
+        tocarMusicaDeFundo();
     }
 
     Random rand = new Random();
     TelaInicial inicio = new TelaInicial();
 
-    int aleatorioJogador = 0, aleatorioCpu = 0, pontoJogador = 0, pontoCpu = 0, perfilCpu;
+    int aleatorioJogador = 0, aleatorioCpu = 0, pontoJogador = 0, pontoCpu = 0, perfilCpu = 0;
     String textoJogador, textoCpu, perfilTexto;
+
+    public void tocarMusicaDeFundo() {
+
+        // 💡 ATENÇÃO: Substitua pelo caminho EXATO do seu arquivo WAV dentro do projeto!
+        String caminhoAudio = "/br/com/jogo/musica/videoplayback.wav";
+        URL url = getClass().getResource(caminhoAudio);
+
+        if (url == null) {
+            System.err.println("ERRO: Arquivo WAV não encontrado no Classpath: " + caminhoAudio);
+            return;
+        }
+
+        try (javax.sound.sampled.AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url)) {
+
+            musicaDeFundo = AudioSystem.getClip();
+            musicaDeFundo.open(audioInputStream);
+
+            // Toca a música e define para repetir indefinidamente
+            musicaDeFundo.loop(Clip.LOOP_CONTINUOUSLY);
+            musicaDeFundo.start();
+
+        } catch (UnsupportedAudioFileException e) {
+            System.err.println("ERRO: Formato de áudio não suportado (não é WAV válido).");
+        } catch (IOException e) {
+            System.err.println("ERRO: Falha ao ler o arquivo de áudio.");
+        } catch (LineUnavailableException e) {
+            System.err.println("ERRO: Linha de áudio do sistema indisponível.");
+        } catch (Exception e) {
+            System.err.println("ERRO INESPERADO ao carregar áudio. " + e.getMessage());
+        }
+    }
+
+    public void pararMusica() {
+        if (musicaDeFundo != null && musicaDeFundo.isRunning()) {
+            musicaDeFundo.stop();
+            musicaDeFundo.close();
+            // Libera a memória e os recursos do sistema
+        }
+    }
 
     public void iconeCpu() {
         String imgPerfil;
@@ -52,11 +101,11 @@ public class TelaJogo extends javax.swing.JFrame {
         }
         lblNomeCpu.setText(perfilTexto);
         javax.swing.ImageIcon icone = new javax.swing.ImageIcon(
-                        getClass().getResource(imgPerfil)
-                );
+                getClass().getResource(imgPerfil)
+        );
 
-                // Aplica o ícone ao JLabel do CPU
-                lblPerfil.setIcon(icone);
+        // Aplica o ícone ao JLabel do CPU
+        lblPerfil.setIcon(icone);
     }
 
     public void exibirNomeJogador() {
@@ -192,11 +241,11 @@ public class TelaJogo extends javax.swing.JFrame {
 
         try (Connection conexao = ModeloConexao.conector();
                 java.sql.PreparedStatement pst = conexao.prepareStatement(sql)) {
-            pst.setInt(1, pontoJogador); 
+            pst.setInt(1, pontoJogador);
             pst.setString(2, textoJogador);
-            pst.setInt(3, pontoCpu); 
+            pst.setInt(3, pontoCpu);
             pst.setString(4, perfilTexto);
-            pst.setInt(5, idDoJogador); 
+            pst.setInt(5, idDoJogador);
 
             int linhasAfetadas = pst.executeUpdate();
 
@@ -230,9 +279,11 @@ public class TelaJogo extends javax.swing.JFrame {
             TelaInicial inicio = new TelaInicial();
             inicio.setVisible(true);
             this.setVisible(false);
+            pararMusica();
         }
     }
 
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
