@@ -44,11 +44,11 @@
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
               <Table columnCount="5" rowCount="1">
-                <Column editable="true" title="T&#xed;tulo 1" type="java.lang.Object"/>
-                <Column editable="true" title="T&#xed;tulo 2" type="java.lang.Object"/>
-                <Column editable="true" title="T&#xed;tulo 3" type="java.lang.Object"/>
-                <Column editable="true" title="T&#xed;tulo 4" type="java.lang.Object"/>
-                <Column editable="true" title="T&#xed;tulo 5" type="java.lang.Object"/>
+                <Column editable="true" title="JOGADOR" type="java.lang.Object"/>
+                <Column editable="true" title="PONTTOS" type="java.lang.Object"/>
+                <Column editable="true" title="RESULTADO" type="java.lang.Object"/>
+                <Column editable="true" title="PONTOS" type="java.lang.Object"/>
+                <Column editable="true" title="CPU" type="java.lang.Object"/>
               </Table>
             </Property>
           </Properties>

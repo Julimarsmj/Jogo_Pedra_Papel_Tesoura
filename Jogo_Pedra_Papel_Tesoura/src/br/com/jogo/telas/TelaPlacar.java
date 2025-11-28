@@ -87,7 +87,7 @@ public class TelaPlacar extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Título 1", "Título 2", "Título 3", "Título 4", "Título 5"
+                "JOGADOR", "PONTTOS", "RESULTADO", "PONTOS", "CPU"
             }
         ));
         jScrollPane1.setViewportView(jTableRanking);

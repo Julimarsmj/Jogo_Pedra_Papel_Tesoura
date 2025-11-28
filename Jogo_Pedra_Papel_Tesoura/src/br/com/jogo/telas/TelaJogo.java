@@ -21,14 +21,43 @@ public class TelaJogo extends javax.swing.JFrame {
      */
     public TelaJogo() {
         initComponents();
+        iconeCpu();
         exibirNomeJogador();
     }
 
     Random rand = new Random();
     TelaInicial inicio = new TelaInicial();
 
-    int aleatorioJogador = 0, aleatorioCpu = 0, pontoJogador = 0, pontoCpu = 0;
-    String textoJogador, textoCpu;
+    int aleatorioJogador = 0, aleatorioCpu = 0, pontoJogador = 0, pontoCpu = 0, perfilCpu;
+    String textoJogador, textoCpu, perfilTexto;
+
+    public void iconeCpu() {
+        String imgPerfil;
+        perfilCpu = rand.nextInt(4) + 1;
+        if (perfilCpu == 1) {
+            perfilTexto = "RÔBO";
+            imgPerfil = "/br/com/jogo/img/rival.png";
+        } else if (perfilCpu == 2) {
+            perfilTexto = "ORÁCULO";
+            imgPerfil = "/br/com/jogo/img/oraculo.png";
+        } else if (perfilCpu == 3) {
+            perfilTexto = "CYGNUS";
+            imgPerfil = "/br/com/jogo/img/cygnus.png";
+        } else if (perfilCpu == 4) {
+            perfilTexto = "ALGORITMO 7";
+            imgPerfil = "/br/com/jogo/img/algoritmo.png";
+        } else {
+            perfilTexto = "BYTE";
+            imgPerfil = "/br/com/jogo/img/byte.png";
+        }
+        lblNomeCpu.setText(perfilTexto);
+        javax.swing.ImageIcon icone = new javax.swing.ImageIcon(
+                        getClass().getResource(imgPerfil)
+                );
+
+                // Aplica o ícone ao JLabel do CPU
+                lblPerfil.setIcon(icone);
+    }
 
     public void exibirNomeJogador() {
         int idDoJogador = br.com.jogo.telas.TelaCadJogador.idJogadorAtual;
@@ -152,7 +181,7 @@ public class TelaJogo extends javax.swing.JFrame {
 
     public void salvarRegistroDePartida() {
 
-        String sql = "UPDATE tbregistro SET pontuacao_jogador = ?, resultado_final = ?, pontuacao_cpu = ? WHERE id = ?";
+        String sql = "UPDATE tbregistro SET pontuacao_jogador = ?, resultado_final = ?, pontuacao_cpu = ?, nomecpu = ? WHERE id = ?";
 
         int idDoJogador = br.com.jogo.telas.TelaCadJogador.idJogadorAtual;
 
@@ -163,18 +192,11 @@ public class TelaJogo extends javax.swing.JFrame {
 
         try (Connection conexao = ModeloConexao.conector();
                 java.sql.PreparedStatement pst = conexao.prepareStatement(sql)) {
-
-            // 1. Mapeia a pontuação do JOGADOR
-            pst.setInt(1, pontoJogador); // Corresponde a pontuacao_jogador
-
-            // 2. Mapeia o resultado final do JOGADOR
-            pst.setString(2, textoJogador); // Corresponde a resultado_final
-
-            // 3. 💡 NOVO: Mapeia a pontuação do CPU
-            pst.setInt(3, pontoCpu); // Corresponde a pontuacao_cpu
-
-            // 4. Mapeia o ID para o filtro WHERE
-            pst.setInt(4, idDoJogador); // Corresponde ao WHERE id
+            pst.setInt(1, pontoJogador); 
+            pst.setString(2, textoJogador);
+            pst.setInt(3, pontoCpu); 
+            pst.setString(4, perfilTexto);
+            pst.setInt(5, idDoJogador); 
 
             int linhasAfetadas = pst.executeUpdate();
 
@@ -223,8 +245,8 @@ public class TelaJogo extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         lblPontosCpu = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        lblNomeCpu = new javax.swing.JLabel();
+        lblPerfil = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         lblNomeJogador = new javax.swing.JLabel();
         lblPontosJogador = new javax.swing.JLabel();
@@ -248,8 +270,8 @@ public class TelaJogo extends javax.swing.JFrame {
 
         lblPontosCpu.setFont(new java.awt.Font("Dialog", 1, 36)); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
-        jLabel2.setText("CPU");
+        lblNomeCpu.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        lblNomeCpu.setText("CPU");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -259,14 +281,14 @@ public class TelaJogo extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblPontosCpu, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                    .addComponent(lblNomeCpu))
                 .addContainerGap(180, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
+                .addComponent(lblNomeCpu)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblPontosCpu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(27, 27, 27))
@@ -274,8 +296,8 @@ public class TelaJogo extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(146, 49, -1, 90));
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/jogo/img/rival.png"))); // NOI18N
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 14, -1, -1));
+        lblPerfil.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/jogo/img/rival.png"))); // NOI18N
+        getContentPane().add(lblPerfil, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, -1, -1));
 
         jPanel2.setBackground(new java.awt.Color(179, 224, 230));
 
@@ -453,8 +475,6 @@ public class TelaJogo extends javax.swing.JFrame {
     private javax.swing.JButton btnPedra;
     private javax.swing.JButton btnTesoura;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -462,7 +482,9 @@ public class TelaJogo extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JLabel lblCampoCpu;
     private javax.swing.JLabel lblCampoJogador;
+    private javax.swing.JLabel lblNomeCpu;
     private javax.swing.JLabel lblNomeJogador;
+    private javax.swing.JLabel lblPerfil;
     private javax.swing.JLabel lblPontosCpu;
     private javax.swing.JLabel lblPontosJogador;
     // End of variables declaration//GEN-END:variables
